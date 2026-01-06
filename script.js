@@ -62,6 +62,44 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(element);
     });
 
+    // Auto-Scroll Reviews Logic
+    const scroller = document.querySelector('.reviews-marquee-wrapper');
+    if (scroller) {
+        let isPaused = false;
+
+        // Auto Scroll Function
+        const autoScroll = () => {
+            if (!isPaused) {
+                scroller.scrollLeft += 1;
+                // Infinite Loop Effect (roughly)
+                // When we reach near the end, we can arguably jump back if we had duplicated content
+                // For now, let's simply reset if it hits the end to simulate loop if content is duplicated enough
+                // Or just let it scroll. Given the request "maintain sliding alone", a simple increment is best.
+                // To make it truly infinite without jump requires precise content duplication.
+                // Assuming content is duplicated in HTML as seen before.
+                if (scroller.scrollLeft >= scroller.scrollWidth / 2) {
+                     // If we have 2 sets of identical items, jumping back to 0 when halfway is a common trick
+                     // provided the scrollWidth/2 is exactly the width of one set.
+                     // A safer check is:
+                     if (scroller.scrollLeft >= (scroller.scrollWidth - scroller.clientWidth - 1)) {
+                        scroller.scrollLeft = 0; 
+                     }
+                }
+            }
+        };
+
+        // Run auto scroll
+        let scrollInterval = setInterval(autoScroll, 20); // 50fps approx
+
+        // Interaction Handling
+        scroller.addEventListener('mouseenter', () => isPaused = true);
+        scroller.addEventListener('mouseleave', () => isPaused = false);
+        scroller.addEventListener('touchstart', () => isPaused = true);
+        scroller.addEventListener('touchend', () => {
+             setTimeout(() => isPaused = false, 2000); // Resume after 2s of no touch
+        });
+    }
+
     // Parallax Effect for Hero (Safe check)
     const heroBg = document.querySelector('.hero-bg img');
     if (heroBg) {
